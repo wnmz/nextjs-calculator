@@ -80,7 +80,7 @@ const Calculator: React.FC = ({ }) => {
     const handleMemoryAdd = () => {
         addMemory({
             id: 'unknown',
-            number: parseFloat(state.currentOperand)
+            value: parseFloat(state.currentOperand)
         })
     }
 

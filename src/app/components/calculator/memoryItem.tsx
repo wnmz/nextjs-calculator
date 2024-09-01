@@ -17,20 +17,20 @@ const MemoryItem: React.FC<MemoryProps> = ({ memory, onMemoryUpdate, onMemoryDel
   const onMemoryAdd = () => {
     onMemoryUpdate({
       ...memory,
-      number: memory.number + parseFloat(state.currentOperand)
+      value: memory.value + parseFloat(state.currentOperand)
     })
   }
 
   const onMemorySubtract = () => {
     onMemoryUpdate({
       ...memory,
-      number: memory.number - parseFloat(state.currentOperand)
+      value: memory.value - parseFloat(state.currentOperand)
     })
   }
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-lg mt-4">
-      <div className="text-lg font-bold text-gray-800 text-right mb-4">{String(memory.number)}</div>
+      <div className="text-lg font-bold text-gray-800 text-right mb-4">{String(memory.value)}</div>
       <div className="flex justify-between">
         <button
           className="bg-orange-500 p-2 rounded-lg text-sm font-semibold text-white hover:bg-orange-300"

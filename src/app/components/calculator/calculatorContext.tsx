@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { CalcHistory } from './history';
 
 export interface CalcMemory {
-  number: number,
-  id: string
+  value: number;
+  id: string;
 }
 
 export interface CalculatorState {
@@ -41,12 +41,38 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
     currentOperand: '0',
     prevOperand: null,
     currentOperation: null,
-    memory: [{
-      id: '123',
-      number: 4
-    }],
+    memory: [],
     history: [],
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data)
+          setState((prevState) => ({
+            ...prevState,
+            history: data.data.calculations || [],
+            memory: data.data.memory || [],
+          }));
+        } else {
+          console.error('Failed to fetch user data:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const setCurrentOperand = (operand: string) => {
     setState((prevState) => ({ ...prevState, currentOperand: operand }));
@@ -60,28 +86,68 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
     setState((prevState) => ({ ...prevState, currentOperation: operation }));
   };
 
-  const addHistory = (entry: CalcHistory) => {
-    setState((prevState) => ({ ...prevState, history: [entry, ...prevState.history] }));
+  const addHistory = async (entry: CalcHistory) => {
+    try {
+      const response = await fetch('/api/calculation/history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entry),
+      });
+
+      if (response.ok) {
+        const savedEntry = await response.json();
+        setState((prevState) => ({
+          ...prevState,
+          history: [savedEntry.data, ...prevState.history],
+        }));
+      } else {
+        console.error('Failed to save history:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error saving history:', error);
+    }
   };
 
   const clearHistory = () => {
     setState((prevState) => ({ ...prevState, history: [] }));
   };
 
-  const addMemory = (entry: CalcMemory) => {
-    setState((prevState) => ({ ...prevState, memory: [entry, ...prevState.memory] }));
-  }
+  const addMemory = async (entry: CalcMemory) => {
+    try {
+      const response = await fetch('/api/calculation/memory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entry),
+      });
+
+      if (response.ok) {
+        const savedEntry = await response.json();
+        setState((prevState) => ({
+          ...prevState,
+          memory: [savedEntry.data, ...prevState.memory],
+        }));
+      } else {
+        console.error('Failed to save memory:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error saving memory:', error);
+    }
+  };
 
   const updateMemory = (entry: CalcMemory) => {
     setState((prevState) => {
       const updatedMemory = [...prevState.memory];
-      for(let i = 0; i < updatedMemory.length; i++) {
-        if(updatedMemory[i].id == entry.id) {
+      for (let i = 0; i < updatedMemory.length; i++) {
+        if (updatedMemory[i].id === entry.id) {
           updatedMemory[i] = entry;
           break;
         }
       }
-      
+
       return { ...prevState, memory: updatedMemory };
     });
   };
@@ -92,8 +158,6 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
       return { ...prevState, memory: updatedMemory };
     });
   };
-
-
 
   return (
     <CalculatorContext.Provider
@@ -106,7 +170,7 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
         clearHistory,
         addMemory,
         updateMemory,
-        deleteMemory
+        deleteMemory,
       }}
     >
       {children}

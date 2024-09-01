@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { errorRespose, successResponse } from "../../responses/baseResponse";
 import { verifyToken } from "@/utils/jwt";
 import prisma from "@/utils/prismaClient";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
     let token = req.cookies.get("token")?.value;
@@ -21,9 +22,17 @@ export async function GET(req: NextRequest) {
             id: jwt.payload.id
         },
         include: {
-            calculations: true,
-            memory: true,
-        }
+            calculations: {
+                orderBy: {
+                    created_at: Prisma.SortOrder.desc
+                }
+            },
+            memory: {
+                orderBy: {
+                    created_at: Prisma.SortOrder.desc
+                }
+            },
+        },
     });
 
     if(!user) {
