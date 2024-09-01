@@ -66,8 +66,11 @@ const Calculator: React.FC = ({ }) => {
 
     const [expression, setExpression] = useState<string>("");
     const [isResultCalculated, setIsResultCalculated] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleDigitClick = (digit: number | string) => {
+        if(errorMessage) setErrorMessage(null);
+        
         if (isResultCalculated) {
             setCurrentOperand(String(digit));
             setIsResultCalculated(false);
@@ -85,6 +88,8 @@ const Calculator: React.FC = ({ }) => {
     }
 
     const handleDeleteLastChar = () => {
+        if(errorMessage) setErrorMessage(null);
+
         setCurrentOperand(state.currentOperand.length == 1 ? 
             "0" : state.currentOperand.slice(0, state.currentOperand.length - 1)
         );
@@ -130,41 +135,51 @@ const Calculator: React.FC = ({ }) => {
         const current = parseFloat(state.currentOperand);
 
         let result;
-        switch (state.currentOperation) {
-            case "+":
-                result = prev + current;
-                break;
-            case "-":
-                result = prev - current;
-                break;
-            case "*":
-                result = prev * current;
-                break;
-            case "/":
-                result = prev / current;
-                break;
-            default:
-                return;
+
+        try {
+            switch (state.currentOperation) {
+                case "+":
+                    result = prev + current;
+                    break;
+                case "-":
+                    result = prev - current;
+                    break;
+                case "*":
+                    result = prev * current;
+                    break;
+                case "/":
+                    if (current === 0) {
+                        throw new Error("Cannot divide by zero");
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    throw new Error("Unknown operation");
+            }
+
+            addHistory({
+                first_operand: prev,
+                second_operand: current,
+                operator: state.currentOperation,
+                result: result
+            });
+
+            setCurrentOperand(String(result));
+            setExpression(`${state.prevOperand} ${state.currentOperation} ${state.currentOperand} =`);
+            setPrevOperand(String(result));
+            setCurrentOperation(null);
+            setIsResultCalculated(true);
+            setErrorMessage(null);  // Clear any existing error message
+        } catch (error: any) {
+            setErrorMessage(error.message);  // Set error message to display
+            clearDisplay();
         }
-
-        addHistory({
-            first_operand: prev,
-            second_operand: current,
-            operator: state.currentOperation,
-            result: result
-        })
-
-        setCurrentOperand(String(result));
-        setExpression(`${state.prevOperand} ${state.currentOperation} ${state.currentOperand} =`);
-        setPrevOperand(String(result));
-        setCurrentOperation(null);
-        setIsResultCalculated(true);
     };
 
     return (
         <div className="bg-white rounded-lg shadow-lg p-4 w-80">
             {/* Calculator Display */}
-            <Display expression={expression} value={state.currentOperand} />
+            <Display expression={expression} value={errorMessage || state.currentOperand} />
 
             {/* Calculator Buttons */}
             <div className="grid grid-cols-4 gap-2 min-w-[290px]">

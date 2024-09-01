@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { calculatorService } from '@/services/calculator.service'
 import { CalcHistory } from './history';
+import { CalcMemory } from './memory';
 
-export interface CalcMemory {
-  value: number;
-  id: string;
-}
 
 export interface CalculatorState {
   currentOperand: string;
@@ -46,32 +44,20 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const initialize = async () => {
       try {
-        const response = await fetch('/api/user/me', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data)
-          setState((prevState) => ({
-            ...prevState,
-            history: data.data.calculations || [],
-            memory: data.data.memory || [],
-          }));
-        } else {
-          console.error('Failed to fetch user data:', response.statusText);
-        }
+        const userData = await calculatorService.fetchUserData();
+        setState((prevState) => ({
+          ...prevState,
+          history: userData.calculations || [],
+          memory: userData.memory || [],
+        }));
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Failed to initialize user data:', error);
       }
     };
 
-    fetchUserData();
+    initialize();
   }, []);
 
   const setCurrentOperand = (operand: string) => {
@@ -88,25 +74,13 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
 
   const addHistory = async (entry: CalcHistory) => {
     try {
-      const response = await fetch('/api/calculation/history', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(entry),
-      });
-
-      if (response.ok) {
-        const savedEntry = await response.json();
-        setState((prevState) => ({
-          ...prevState,
-          history: [savedEntry.data, ...prevState.history],
-        }));
-      } else {
-        console.error('Failed to save history:', response.statusText);
-      }
+      const savedEntry = await calculatorService.saveHistory(entry);
+      setState((prevState) => ({
+        ...prevState,
+        history: [savedEntry, ...prevState.history],
+      }));
     } catch (error) {
-      console.error('Error saving history:', error);
+      console.error('Failed to add history:', error);
     }
   };
 
@@ -116,43 +90,37 @@ export const CalculatorProvider: React.FC<{ children: ReactNode }> = ({ children
 
   const addMemory = async (entry: CalcMemory) => {
     try {
-      const response = await fetch('/api/calculation/memory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(entry),
-      });
-
-      if (response.ok) {
-        const savedEntry = await response.json();
-        setState((prevState) => ({
-          ...prevState,
-          memory: [savedEntry.data, ...prevState.memory],
-        }));
-      } else {
-        console.error('Failed to save memory:', response.statusText);
-      }
+      const savedEntry = await calculatorService.saveMemory(entry);
+      setState((prevState) => ({
+        ...prevState,
+        memory: [savedEntry, ...prevState.memory],
+      }));
     } catch (error) {
-      console.error('Error saving memory:', error);
+      console.error('Failed to add memory:', error);
     }
   };
 
-  const updateMemory = (entry: CalcMemory) => {
-    setState((prevState) => {
-      const updatedMemory = [...prevState.memory];
-      for (let i = 0; i < updatedMemory.length; i++) {
-        if (updatedMemory[i].id === entry.id) {
-          updatedMemory[i] = entry;
-          break;
+  const updateMemory = async (entry: CalcMemory) => {
+    try {
+      const savedEntry = await calculatorService.updateMemory(entry);
+      setState((prevState) => {
+        const updatedMemory = [...prevState.memory];
+        for (let i = 0; i < updatedMemory.length; i++) {
+          if (updatedMemory[i].id === entry.id) {
+            updatedMemory[i] = entry;
+            break;
+          }
         }
-      }
 
-      return { ...prevState, memory: updatedMemory };
-    });
+        return { ...prevState, memory: updatedMemory };
+      });
+    } catch (error) {
+      console.error('Failed to update memory:', error);
+    }
   };
 
-  const deleteMemory = (entry: CalcMemory) => {
+  const deleteMemory = async (entry: CalcMemory) => {
+    let deleted = await calculatorService.deleteMemory(entry);
     setState((prevState) => {
       const updatedMemory = prevState.memory.filter((mem) => entry.id !== mem.id);
       return { ...prevState, memory: updatedMemory };

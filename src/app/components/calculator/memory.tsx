@@ -1,8 +1,13 @@
 'use client';
 
 import { Fragment } from "react";
-import { CalcMemory, useCalculator } from "./calculatorContext";
+import { useCalculator } from "./calculatorContext";
 import MemoryItem from "./memoryItem";
+
+export interface CalcMemory {
+    value: number;
+    id: string;
+}
 
 export interface CalcHistory {
     operator: string;
@@ -27,13 +32,13 @@ const Memory: React.FC = () => {
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Memory</h2>
             <ul className="space-y-3">
                 {state.memory.map((item, index) => (
-                  <Fragment key={index}>
-                        <MemoryItem 
-                             memory={item}
-                             onMemoryDelete={onMemoryDelete}
-                             onMemoryUpdate={onMemoryUpdate}
+                    <Fragment key={index}>
+                        <MemoryItem
+                            memory={item}
+                            onMemoryDelete={onMemoryDelete}
+                            onMemoryUpdate={onMemoryUpdate}
                         />
-                  </Fragment> 
+                    </Fragment>
                 ))}
             </ul>
         </div>

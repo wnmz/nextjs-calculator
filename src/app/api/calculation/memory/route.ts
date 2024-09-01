@@ -8,7 +8,7 @@ import { CreateMemoryDto } from "./dto/createMemoryDto";
 
 export async function POST(req: NextRequest) {
   const token = req.cookies.get("token")?.value ?? "";
-  const data: any = await req.json();
+  const data: CreateMemoryDto = await req.json();
   const validationErrors = await validateBody(data, CreateMemoryDto);
 
   if (validationErrors) {
@@ -21,18 +21,38 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const memory = await prisma.memory.create({
-      data: {
-        value: data.value,
-        user: {
-          connect: { id: jwt.payload.id },
-        },
+    const userId = jwt.payload.id;
+
+    const existingMemory = await prisma.memory.findFirst({
+      where: {
+        id: data.id
       },
     });
 
+    let memory;
+
+    if (existingMemory) {
+      memory = await prisma.memory.update({
+        where: { id: existingMemory.id },
+        data: {
+          value: data.value,
+        },
+      });
+    } else {
+      memory = await prisma.memory.create({
+        data: {
+          value: data.value,
+          user: {
+            connect: { id: userId },
+          },
+        },
+      });
+    }
+
     return NextResponse.json(successResponse(memory));
   } catch (error) {
-    return NextResponse.json(errorRespose("Failed to add memory item"), { status: 500 });
+    console.error("Error while saving/updating memory:", error);
+    return NextResponse.json(errorRespose("Failed to save memory item"), { status: 500 });
   }
 }
 
@@ -62,12 +82,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// DELETE Method: Remove a specific memory item by ID for the user
 export async function DELETE(req: NextRequest) {
   const token = req.cookies.get("token")?.value ?? "";
-  const { memoryId } = await req.json();
+  const { id } = await req.json();
 
-  if (!memoryId) {
+  if (!id) {
     return NextResponse.json(errorRespose("Memory ID is required"), { status: 400 });
   }
 
@@ -80,7 +99,7 @@ export async function DELETE(req: NextRequest) {
     const userId = jwt.payload.id;
 
     const memoryItem = await prisma.memory.findUnique({
-      where: { id: memoryId, user_id: userId },
+      where: { id: id, user_id: userId },
     });
 
     if (!memoryItem) {
@@ -88,7 +107,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     await prisma.memory.delete({
-      where: { id: memoryId },
+      where: { id: id },
     });
 
     return NextResponse.json(successResponse({ message: "Memory item deleted successfully" }));
