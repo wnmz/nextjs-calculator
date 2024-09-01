@@ -88,8 +88,8 @@ export default function AuthLoginPage() {
 
                     {/* Register Link */}
                     <p className="mt-4 text-sm text-center text-gray-600">
-                        Don't have an account?{' '}
-                        <a href="/auth/register" className="text-blue-500 hover:underline">
+                        Don&apos;t have an account?
+                        <a href="/auth/register" className="ml-2 text-blue-500 hover:underline">
                             Register
                         </a>
                     </p>
