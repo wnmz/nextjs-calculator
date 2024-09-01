@@ -1,4 +1,4 @@
-import AuthResponse from "@/app/api/user/login/responses/authResponse";
+import AuthResponse from "@/app/api/user/types/authResponse";
 import { User } from "@prisma/client";
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import Cookies from "js-cookie";
@@ -27,13 +27,17 @@ export class AuthService {
         return resp.data;
     };
 
-    public static getMe = (userId: string) => {
+    public static getMe = () => {
         return this.instance
-            .get(`/users/${userId}`, {
-                headers: getAuthorizationHeader(),
+            .get(`/api/user/me`, {
+                //headers: getAuthorizationHeader(),
             })
             .then((res) => {
                 return res.data;
             });
     };
+
+    public static logout = () => {
+        Cookies.remove("token");
+    }
 }

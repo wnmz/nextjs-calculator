@@ -8,12 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        // Override the default text color
-        black: "#000000",
-      },
       textColor: {
-        DEFAULT: "#000000", // Set default text color to black
+        DEFAULT: '#000000',
+      },
+      backgroundColor: {
+        DEFAULT: '#FFFFFF', 
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

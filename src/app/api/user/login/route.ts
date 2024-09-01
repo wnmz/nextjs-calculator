@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { errorRespose, successResponse } from "../../responses/baseResponse";
-import { AuthData } from "./responses/authResponse";
+import { AuthData } from "../types/authResponse";
 import { hash } from "bcrypt";
 import { verifyToken } from "@/utils/jwt";
 
@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(successResponse<AuthData>({
-         accessToken: token
+         accessToken: token,
+         payload: {
+            email: user.email,
+            id: user.id
+         }
     }));
 }

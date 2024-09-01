@@ -1,9 +1,10 @@
 "use client";
-import AuthResponse from "@/app/api/user/login/responses/authResponse";
+
 import { AuthService } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Cookies from "js-cookie";
+import AuthResponse from "@/app/api/user/types/authResponse";
 
 export default function AuthLoginPage() {
     const [email, setEmail] = useState('');
@@ -23,7 +24,10 @@ export default function AuthLoginPage() {
                 console.log('Login successful:', resp.data);
                 Cookies.set("token", resp.data?.accessToken ?? "");
                 
-                router.push("/");
+                Cookies.set("currentUser", JSON.stringify(resp.data) ?? "{}");
+
+                // с router.push не ререндерит NavBar
+                window.location.href = "/";
             }
         } catch (err) {
             setError('Unknown error. Please try again later.');
