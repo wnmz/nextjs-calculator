@@ -5,6 +5,9 @@
     "sourceMap": true,
     "skipLibCheck": true,
     "strict": true,
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,  // Enable experimental decorators
+    "emitDecoratorMetadata": true,   // Enable emitting decorator metadata
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",

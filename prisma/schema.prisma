@@ -32,7 +32,7 @@ model Calculation {
   first_operand  Float
   second_operand Float?
 
-  result Float
+  result   Float
   
   operator String
 }
