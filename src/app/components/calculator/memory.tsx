@@ -28,9 +28,9 @@ const Memory: React.FC = () => {
     }
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-lg mt-4 w-80">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Memory</h2>
-            <ul className="space-y-3">
+        <div className="bg-white p-4 rounded-lg shadow-lg w-80">
+            {/* <h2 className="text-xl font-semibold mb-4 text-gray-800">Memory</h2> */}
+            <ul className="space-y-2 max-h-[500px] overflow-y-auto">
                 {state.memory.map((item, index) => (
                     <Fragment key={index}>
                         <MemoryItem
