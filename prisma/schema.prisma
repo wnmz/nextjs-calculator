@@ -34,7 +34,7 @@ model Calculation {
 
   result Float
   
-  operator Operators
+  operator String
 }
 
 model Memory {
@@ -45,11 +45,4 @@ model Memory {
   user_id String
   
   value Float
-}
-
-enum Operators {
-  OP_PLUS
-  OP_MINUS
-  OP_DIV
-  OP_MULT
 }
