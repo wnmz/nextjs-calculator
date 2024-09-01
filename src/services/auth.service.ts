@@ -27,6 +27,15 @@ export class AuthService {
         return resp.data;
     };
 
+    public static register = async (email: string, password: string) => {
+        let resp = await this.instance.post("/api/user/register", {
+            email,
+            password,
+        });
+
+        return resp.data;
+    };
+
     public static getMe = () => {
         return this.instance
             .get(`/api/user/me`, {

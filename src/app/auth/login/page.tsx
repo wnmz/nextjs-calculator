@@ -36,8 +36,8 @@ export default function AuthLoginPage() {
 
     return (
         <>
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
+            <div className="min-h-screen w-full flex items-center justify-center text-black bg-gray-100">
+                <div className="bg-white p-8 rounded shadow-md w-full min-w-[400px] max-w-sm">
                     {error && (
                         <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
                             {error}
@@ -76,17 +76,6 @@ export default function AuthLoginPage() {
                             />
                         </div>
 
-                        {/* Remember Me and Forgot Password */}
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center">
-                                <input type="checkbox" className="form-checkbox" />
-                                <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                            </label>
-                            <a href="#" className="text-sm text-blue-500 hover:underline">
-                                Forgot Password?
-                            </a>
-                        </div>
-
                         {/* Auth Button */}
                         <button
                             type="submit"
@@ -100,7 +89,7 @@ export default function AuthLoginPage() {
                     {/* Register Link */}
                     <p className="mt-4 text-sm text-center text-gray-600">
                         Don't have an account?{' '}
-                        <a href="#" className="text-blue-500 hover:underline">
+                        <a href="/auth/register" className="text-blue-500 hover:underline">
                             Register
                         </a>
                     </p>
