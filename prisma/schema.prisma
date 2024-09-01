@@ -14,24 +14,35 @@ datasource db {
 }
 
 model User {
-  id  String @id @default(uuid())
-  email String @unique
+  id       String @id @default(uuid())
+  email    String @unique
   password String
-  
+
   calculations Calculation[]
+  memory Memory[]
 }
 
 model Calculation {
-  id  String @id @default(uuid())
-  created_at DateTime
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
 
-  user  User @relation(fields: [user_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id])
   user_id String
 
-  first_operand Float
+  first_operand  Float
   second_operand Float?
 
   operator Operators
+}
+
+model Memory {
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  
+  value Float
 }
 
 enum Operators {
