@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sync": "npx prisma db push",
+    "sync": "npx prisma generate && npx prisma migrate dev",
+    "start:migrate": "npm run sync && npm run start",
     "migrate": "npx prisma migrate dev"
   },
   "dependencies": {
